@@ -19,25 +19,25 @@
 
 ## ¿Qué es Player A?
 
-Player A es una skill para Claude Code que lleva el
-[Toolkit de IA de Servnet] a la práctica dentro del
-flujo de desarrollo.
+Player A es una skill para Claude Code que lleva el Toolkit de IA de Servnet
+a la práctica dentro del flujo de trabajo diario.
 
-La mayor fuente de retrabajo en proyectos no es el código — son las
-instrucciones mal estructuradas. Un prompt vago genera supuestos. Los
-supuestos generan iteraciones. Las iteraciones consumen tiempo y recursos.
+Está diseñada para dos cosas concretas:
 
-**Player A interrumpe ese ciclo.**
+1. **Mejorar la calidad de los prompts** — evalúa en tiempo real si tu
+   instrucción tiene los 4 ingredientes necesarios para llegar al resultado
+   en el primer intento.
 
-Evalúa la calidad de cada prompt en tiempo real, identifica exactamente
-qué ingrediente falta, sugiere la versión estructurada y registra los
-patrones del usuario entre sesiones para medir la mejora con el tiempo.
+2. **Orientar el uso del modelo correcto** — informa qué modelo de Claude
+   se adapta mejor a cada tipo de tarea, con base en las áreas y puestos
+   reales de Servnet. No prescribe — educa sobre buenas prácticas.
 
 ---
 
 ## El framework: ROL · CONTEXTO · TAREA · FORMATO
 
-Basado en el Toolkit de IA de Servnet México:
+Basado en el Toolkit de IA de Servnet México, Player A evalúa 4 ingredientes
+en cada prompt:
 
 | Ingrediente | Criterio | Puntos |
 |---|---|---|
@@ -53,10 +53,10 @@ Uno sin ellos genera 2–4 iteraciones adicionales.
 
 ## Funcionalidades
 
-### Prueba de escritorio del prompt
+### 🔍 Prueba de escritorio del prompt
 Cuando detecta un prompt incompleto, Player A lo evalúa automáticamente:
-muestra qué se asumió, el score del prompt y la versión estructurada lista
-para usar.
+muestra qué se asumió, el score del prompt, la versión estructurada sugerida
+y la referencia de modelo más adecuado para esa tarea.
 
 ```
 Prueba de escritorio del prompt
@@ -76,33 +76,64 @@ Prueba de escritorio del prompt
     grupo_clientes de CAPA 8, genera un componente PHP
     con Chart.js que muestre cambios por mes en gráfica
     de línea."
+
+🤖 Referencia de modelo: Sonnet 4.6
+   Para generación de código con contexto técnico específico,
+   Sonnet 4.6 ofrece el mejor balance entre calidad y costo.
+
+   Haiku 4.5 → más rápido y económico, menor precisión en código
+   Sonnet 4.6 → recomendado para esta tarea ✓
+   Opus 4.7  → mayor capacidad, el costo no se justifica aquí
 ```
 
-### Contexto acumulado de sesión
+### 📐 Contexto acumulado de sesión
 Una vez que defines un ingrediente, Player A lo retiene durante toda la
 sesión. No tienes que repetir el rol o el contexto en cada mensaje — solo
-especifica lo que cambia.
+especifica lo que cambia o falta.
 
-### Plan de pruebas antes de escribir código
+### 📋 Plan de pruebas antes de escribir código
 Antes de generar o modificar una función, Player A propone un plan de
 pruebas y solicita aprobación. Esto elimina el ciclo write → fail → fix.
 
-### Reporte de resultados post-prueba
+### ✅ Reporte de resultados post-prueba
 Después de ejecutar tests, presenta solo lo relevante: qué falló, dónde
 y por qué.
 
-### Seguimiento de mejora entre sesiones
+### 📈 Seguimiento de mejora entre sesiones
 Player A guarda un historial en `.player_a_memory.json` que registra:
 - Score de prompts por sesión
 - Ingredientes que más se omiten
+- Fórmulas del toolkit aplicadas
+- Historial de referencias de modelo por tipo de tarea
 - Racha de mejora consecutiva
 
 Al iniciar cada sesión, muestra el resumen y los patrones a mejorar.
 
-### Reconocimiento de las 5 fórmulas del Toolkit
-Cuando aplicas correctamente una de las 5 fórmulas del Toolkit de Servnet
-(El consultor, El revisor, El generador, El transformador, El coach),
-Player A lo confirma.
+### 🤖 Guía de modelos por área y puesto
+Player A incluye una guía de referencia basada en las áreas y puestos
+reales de Servnet (tblAreas y tblPuesto de CAPA 8). Cubre desde
+Planeación Estratégica y Contabilidad hasta NOC, Planta Externa y TI.
+
+El objetivo no es prescribir — es informar sobre buenas prácticas para
+que cada colaborador entienda qué modelo se adapta mejor a su tarea
+y por qué.
+
+### 🎯 Reconocimiento de las 5 fórmulas del Toolkit
+Cuando aplicas correctamente una de las 5 fórmulas del Toolkit de Servnet,
+Player A lo confirma en una línea.
+
+---
+
+## Referencia rápida de modelos
+
+| Modelo | Cuándo usarlo |
+|---|---|
+| **Haiku 4.5** | Tareas repetitivas, clasificación, consultas rápidas, alto volumen |
+| **Sonnet 4.6** | Desarrollo, análisis, redacción, reportes — punto de partida para la mayoría de tareas |
+| **Opus 4.7** | Razonamiento complejo, decisiones críticas, arquitectura, auditorías |
+
+> Sonnet 4.6 es el punto de partida. Sube a Opus cuando la complejidad
+> lo justifique. Baja a Haiku cuando el volumen o la simplicidad lo permitan.
 
 ---
 
@@ -119,7 +150,7 @@ claude skill add --url https://raw.githubusercontent.com/jonatanhidalgo-SERVNET/
 ```bash
 git clone https://github.com/jonatanhidalgo-SERVNET/Player-A-skill.git
 cd Player-A-skill
-claude skill add .
+claude skill add skill/
 ```
 
 ---
@@ -133,6 +164,7 @@ claude skill add .
 | `/player test` | Ejecuta pruebas y presenta reporte |
 | `/player review` | Prueba de escritorio del último prompt |
 | `/player score` | Score acumulado de la sesión |
+| `/player modelos` | Guía de referencia de modelos por área y tarea |
 | `/player reset` | Limpia el contexto acumulado de sesión |
 
 ---
@@ -140,8 +172,7 @@ claude skill add .
 ## Memoria persistente
 
 Player A crea `.player_a_memory.json` en la raíz del proyecto al iniciar
-la primera sesión. Este archivo es personal — no debe compartirse entre
-el equipo.
+la primera sesión. Este archivo es personal — no debe compartirse.
 
 Agregar a `.gitignore`:
 
@@ -155,10 +186,12 @@ Agregar a `.gitignore`:
 
 La reducción no es por respuesta — es por conversación completa.
 
-Un prompt sin estructura genera 3–5 turnos de aclaración e iteración.
+Un prompt sin estructura genera 3–5 turnos de aclaración.
 Un prompt con los 4 ingredientes llega al resultado en 1–2 turnos.
-Player A no reemplaza el criterio profesional — lo amplifica desde el
-primer mensaje.
+
+Usar el modelo adecuado para cada tarea reduce costos sin sacrificar
+calidad. Player A no reemplaza el criterio profesional — lo informa
+con contexto real de Servnet.
 
 ---
 
@@ -166,9 +199,10 @@ primer mensaje.
 
 ```
 Player-A-skill/
-  SKILL.md                   ← Definición de la skill
-  README.md                  ← Este archivo
-  .gitignore                 ← Incluye .player_a_memory.json
+  skill/
+    SKILL.md                   ← Definición de la skill
+    README.md                  ← Este archivo
+  .gitignore                   ← Incluye .player_a_memory.json
 ```
 
 ---
