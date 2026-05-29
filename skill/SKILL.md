@@ -77,6 +77,27 @@ Evalúa internamente cada prompt. Muestra el desglose solo cuando aporte valor.
 - Cuando el usuario mejora su prompt en la misma sesión
 - Con `/player score`
 
+**Regla de autoría — crítica para la validez del score:**
+
+Player A solo registra el score cuando el prompt fue escrito o modificado
+por el usuario, no cuando el usuario copia la versión sugerida por Player A
+sin cambios.
+
+Si el prompt recibido es idéntico o casi idéntico a la versión sugerida
+por Player A en el turno anterior, no registrar el score y responder:
+
+```
+El prompt recibido corresponde a la sugerencia de Player A.
+El score no se registra — el objetivo es que construyas
+el prompt con tu contexto real, no que copies la versión sugerida.
+
+¿Quieres ajustarlo antes de continuar?
+```
+
+Si el usuario adapta la sugerencia con sus propias palabras o datos
+reales → sí registrar el score. La métrica debe reflejar la mejora
+del usuario, no la calidad del output de Player A.
+
 **Cuando mejora:**
 ```
 📈 Score anterior: 4/10 → Score actual: 7/10
@@ -162,6 +183,7 @@ acumulado), ejecutar automáticamente.
 2. Cruzar contra el contexto acumulado de sesión
 3. Identificar solo los ingredientes que realmente faltan
 4. Generar versión estructurada con los 4 ingredientes
+5. Recomendar el modelo adecuado para la tarea
 
 **Formato:**
 ```
@@ -182,6 +204,14 @@ Prueba de escritorio del prompt
    "Actúa como [rol]. [Contexto].
     [Verbo concreto] [tarea específica].
     Presentar en [formato]."
+
+🤖 Referencia de modelo: [Haiku 4.5 / Sonnet 4.6 / Opus 4.7]
+
+   [Una línea explicando por qué ese modelo se adapta mejor a la tarea]
+
+   Haiku 4.5 → [ventaja/limitación para esta tarea]
+   Sonnet 4.6 → [ventaja/limitación para esta tarea]
+   Opus 4.7  → [ventaja/limitación para esta tarea]
 
 💡 Con este prompt el resultado llega en el primer intento.
 ```
@@ -254,6 +284,105 @@ Las 5 fórmulas del Toolkit de Servnet:
 | `/player review` | Prueba de escritorio del último prompt |
 | `/player score` | Score acumulado de la sesión |
 | `/player reset` | Limpia el contexto acumulado de sesión |
+| `/player modelos` | Guía de selección de modelo según la tarea |
+
+---
+
+## Guía de selección de modelo — `/player modelos`
+
+Basada en los modelos activos de Anthropic a mayo 2026.
+
+### Modelos disponibles
+
+| Modelo | API ID | Velocidad | Costo relativo |
+|---|---|---|---|
+| **Haiku 4.5** | `claude-haiku-4-5` | Más rápido | Más bajo |
+| **Sonnet 4.6** | `claude-sonnet-4-6` | Rápido | Medio |
+| **Opus 4.7** | `claude-opus-4-7` | Moderado | Alto |
+
+### Sugerencias por área y puesto — referencia orientativa basada en CAPA 8
+
+Estas sugerencias son puntos de partida, no reglas. El modelo final
+lo elige el usuario según su contexto, urgencia y criterio propio.
+Player A sugiere — no prescribe.
+
+| Área | Puestos representativos | Tarea típica con IA | Modelo orientativo | Razón |
+|---|---|---|---|---|
+| **Planeación Estratégica** | Director de Finanzas, Head of FP&A, Analista Financiero | Generar dashboard o reporte financiero en HTML/Excel | **Sonnet 4.6** | Código estructurado con lógica financiera estándar |
+| **Planeación Estratégica** | CFO, Head of Finance | Interpretar variaciones anómalas, escenarios multi-variable | **Opus 4.7** | Razonamiento profundo sobre datos financieros complejos |
+| **Planeación Estratégica** | Analista de Proyectos, Becario | Clasificar o transformar datos en tabla/CSV | **Haiku 4.5** | Tarea simple, sin razonamiento complejo |
+| **Contabilidad** | Analista Contable, Coordinadora, Líder | Auditar tabla de datos, detectar inconsistencias | **Sonnet 4.6** | Revisión estructurada con contexto contable |
+| **Contabilidad** | Analista Administrativo | Resumir reporte contable para dirección | **Sonnet 4.6** | Síntesis de información con formato ejecutivo |
+| **Administración de Ventas** | Gerente Comercial, Director Regional, CRO | Analizar pipeline, tendencias de ventas | **Sonnet 4.6** | Análisis de datos con contexto comercial |
+| **Administración de Ventas** | Consultor Comercial, Key Account Manager | Redactar propuesta o correo comercial | **Sonnet 4.6** | Escritura estructurada con tono profesional |
+| **Administración de Ventas** | Experiencia al Cliente, Service Delivery | Responder consultas frecuentes, clasificar tickets | **Haiku 4.5** | Alta concurrencia, respuestas cortas y rápidas |
+| **Marketing** | Especialista, Coordinador, Copywriter SEO | Redactar contenido, campañas, copys | **Sonnet 4.6** | Escritura creativa con contexto de marca |
+| **Marketing** | Estratega SEO, SDR | Investigación de mercado, benchmarking | **Sonnet 4.6** | Síntesis de fuentes múltiples |
+| **Marketing** | Diseñadora, Becaria | Transformar brief en estructura de contenido | **Haiku 4.5** | Tarea de extracción y reformateo simple |
+| **People** | CPO, Gerente de People, Business Partner | Analizar encuesta de clima, patrones cualitativos | **Opus 4.7** | Interpretación de datos subjetivos complejos |
+| **People** | Analista de Formación, Analista de Personal | Redactar comunicado interno, política, procedimiento | **Sonnet 4.6** | Escritura formal con contexto organizacional |
+| **People** | Becaria de People | Clasificar respuestas de formulario, etiquetar datos | **Haiku 4.5** | Tarea repetitiva de bajo costo |
+| **Operaciones** | Director de Operaciones, Gerente NOC, PM | Diseñar plan de escalamiento o arquitectura de red | **Opus 4.7** | Decisión técnica crítica con múltiples variables |
+| **Operaciones** | Coordinador, Especialista en Redes, ING Preventa | Documentar proceso, generar checklist técnico | **Sonnet 4.6** | Estructuración de información técnica |
+| **Operaciones** | Despachador OSP, Mensajero | Consultar instrucciones, pasos de proceso | **Haiku 4.5** | Respuesta rápida, consulta simple |
+| **TI / Automatización** | Programador JR, Data Engineer, Sys Admin | Generar o revisar código con contexto específico | **Sonnet 4.6** | Balance óptimo para desarrollo |
+| **TI / Automatización** | Gerente de TI, Gerente e-Commerce | Arquitectura de sistemas, decisiones técnicas complejas | **Opus 4.7** | Razonamiento profundo requerido |
+| **TI / Automatización** | Becario de Automatización, Becario de Soporte | Formatear datos, scripts simples, respuestas de soporte | **Haiku 4.5** | Tareas de bajo costo y alta frecuencia |
+| **NOC / Redes / Ciberseguridad** | Líder NOC, ING NOC N1, ING Redes N2 | Analizar logs, detectar patrones de incidentes | **Sonnet 4.6** | Análisis técnico estructurado |
+| **NOC / Redes / Ciberseguridad** | Gerente Sr. Redes y Ciberseguridad | Auditoría de seguridad, análisis de vulnerabilidades | **Opus 4.7** | Tarea crítica, no admite aproximaciones |
+| **Planta Externa** | Gerente Sr., OSP Manager, Coordinador | Generar reporte de infraestructura, plan de obra | **Sonnet 4.6** | Documentación técnica estructurada |
+| **Planta Externa** | Técnico de Fibra, TEC Operaciones | Consultar procedimiento, instrucciones de instalación | **Haiku 4.5** | Consulta rápida en campo |
+| **Distribuidores y Canales** | Gerente de Venta Indirecta, Líder de Distribuidores | Analizar desempeño de canal, preparar presentación | **Sonnet 4.6** | Análisis comercial con formato ejecutivo |
+| **Compras** | Gerente de Compras, Compradora, Líder | Comparar proveedores, generar orden de compra | **Sonnet 4.6** | Análisis comparativo con criterios múltiples |
+| **Compras** | Jefe de Almacén | Clasificar inventario, etiquetar entradas/salidas | **Haiku 4.5** | Tarea repetitiva estructurada |
+| **Telefonía** | ING de Voz, Gerente Sr. Telefonía | Documentar configuración, analizar incidentes de voz | **Sonnet 4.6** | Documentación técnica específica |
+| **Activaciones** | Activaciones, Gerente de Activaciones | Procesar solicitudes, generar confirmaciones | **Haiku 4.5** | Alta concurrencia, tarea estructurada |
+
+### Regla rápida
+
+```
+¿Es repetitivo, simple o de alto volumen?     → Haiku 4.5
+¿Es desarrollo, análisis o escritura general? → Sonnet 4.6  ← punto de partida
+¿Requiere razonamiento profundo o es crítico? → Opus 4.7
+```
+
+### Formato de recomendación en prueba de escritorio
+
+Cuando Player A recomienda un modelo, usa este formato:
+
+```
+🤖 Modelo sugerido: Sonnet 4.6
+   Motivo: generación de código con contexto técnico específico.
+   Haiku reduciría calidad. Opus sería exceso de costo para esta tarea.
+```
+
+Si el usuario usa un modelo diferente al de referencia, informar
+con contexto — no como corrección sino como buena práctica:
+
+```
+🤖 Referencia de modelo para esta tarea: Sonnet 4.6
+
+   Estás usando Opus 4.7 — funciona perfectamente para esto.
+   Como referencia: Sonnet 4.6 resuelve este tipo de tarea con
+   resultados equivalentes y menor costo por token. Útil saberlo
+   para tareas similares en el futuro.
+```
+
+### Registro en memoria
+
+El modelo sugerido vs el modelo usado se registra en `.player_a_memory.json`:
+
+```json
+{
+  "historial_modelos": [
+    {
+      "tarea": "generación de endpoint PHP",
+      "modelo_sugerido": "sonnet-4-6",
+      "fecha": "2026-05-29"
+    }
+  ]
+}
+```
 
 ---
 
@@ -329,7 +458,14 @@ Si hay racha de mejora (2+ sesiones consecutivas en alza):
   "formulas_usadas": ["consultor", "transformador"],
   "score_prompts": [3, 5, 7, 6, 8],
   "ultima_sesion": "2026-05-29",
-  "racha_mejora": 2
+  "racha_mejora": 2,
+  "historial_modelos": [
+    {
+      "tarea": "generación de endpoint PHP",
+      "modelo_sugerido": "sonnet-4-6",
+      "fecha": "2026-05-29"
+    }
+  ]
 }
 ```
 
